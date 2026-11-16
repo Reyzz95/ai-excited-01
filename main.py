@@ -1,26 +1,26 @@
-"""Copy the whale-breaching-clouds entry image for the make.fun competition.
-
-The image captures a colossal humpback whale breaching through golden clouds
-into a blazing sunset, with a tiny joyful surfer riding its back.
+"""Copy the competition entry image: a colossal whale breaching golden sunset
+clouds, with a tiny joyful surfer riding on its back.
 """
 
 import os
 import hashlib
-import shutil
 from pathlib import Path
+import shutil
 
 
-def main() -> None:
-    source = Path(__file__).with_name("entry.png")
+def main():
+    source = Path(__file__).resolve().with_name("entry.png")
     output_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
-    destination = output_dir / "entry.png"
     output_dir.mkdir(parents=True, exist_ok=True)
-    # Deterministic byte-for-byte copying keeps every run identical.
+    destination = output_dir / "entry.png"
+
     shutil.copyfile(source, destination)
+    # Copying fixed input bytes keeps every run deterministic.
     source_hash = hashlib.sha256(source.read_bytes()).digest()
     destination_hash = hashlib.sha256(destination.read_bytes()).digest()
-    if destination_hash != source_hash:
-        raise SystemExit("integrity check failed: destination hash differs from source")
+    if source_hash != destination_hash:
+        raise SystemExit("Copied entry image failed its SHA-256 integrity check")
+
     print(f"source_size={source.stat().st_size}")
     print(f"destination_size={destination.stat().st_size}")
 
